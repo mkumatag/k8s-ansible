@@ -1,0 +1,64 @@
+---
+#- name: Install Golang
+#  block:
+#    - name: Delete the golang if existing
+#      file:
+#        state: absent
+#        path: "/usr/local/go"
+#
+#    - name: Download golang
+#      unarchive:
+#        src: "https://golang.org/dl/go{{ GOLANG_VERSION }}.linux-ppc64le.tar.gz"
+#        dest: "/usr/local"
+#        remote_src: True
+#
+#    - name: Symlink golang
+#      file: src=/usr/local/go/bin/go dest=/usr/local/bin/go state=link
+
+- name: Install the prereq packages
+  block:
+    - name: Install dnf-plugins-core
+      yum:
+        name: dnf-plugins-core
+        state: latest
+    - name: Install EPEL repo
+      yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+        state: present
+    - name: Enable PowerTools repo
+      shell: dnf config-manager --set-enabled PowerTools
+      args:
+        warn: false
+    - name: Install Packages
+      yum:
+        name:
+          - containers-common
+          - device-mapper-devel
+          - glib2-devel
+          - glibc-devel
+          - gcc
+          - glibc-static
+          - gpgme-devel
+          - libassuan-devel
+          - libgpg-error-devel
+          - libseccomp-devel
+          - libselinux-devel
+          - pkgconfig
+          - make
+          - git
+          - runc
+        state: latest
+  when: ansible_distribution in ['RedHat', 'CentOS']
+
+- name: Install and configure crio-o
+  block:
+    - name: Clone crio-o
+      git:
+        repo: https://github.com/cri-o/cri-o
+        dest: /root/src/github.com/cri-o/cri-o
+        version: "{{ crio_version }}"
+    - name: Build cri-o
+      shell: |
+        cd /root/src/github.com/cri-o/cri-o && \
+        make && \
+        PREFIX=/usr make install

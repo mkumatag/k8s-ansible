@@ -1,0 +1,6 @@
+- name: Install Runtime and Kubernetes
+  hosts:
+    - masters
+    - workers
+  roles:
+    - runtime

@@ -18,6 +18,10 @@ MTU: 9000
 registry_mirrors:
   - https://mirror.gcr.io
   - https://registry-1.docker.io
+# crio configuration
+GOLANG_VERSION: 1.15.3
+crio_version: v1.19.0
+
 
 ##### Kubernetes Configurations #####
 apiserver_port: 992
